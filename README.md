@@ -7,14 +7,13 @@ ShieldSplit runs entirely in your browser. No accounts, no server, no tracking. 
 ## Run it
 
 ```bash
-cd tasks/task-zecsplit
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 That's it. Opens at http://localhost:5173.
 
-To build for production: `npm run build` (static files land in `dist/`).
+To build for production: `pnpm build` (static files land in `dist/`).
 
 ## How it works
 
