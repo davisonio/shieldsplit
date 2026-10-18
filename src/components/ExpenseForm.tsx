@@ -33,17 +33,22 @@ export default function ExpenseForm({ members, onSave, onClose, existing }: Prop
 
   // Rate state
   const [rates, setRates] = useState<{ usd: number; myr: number } | null>(null);
-  const [rateLoading, setRateLoading] = useState(false);
+  const [rateLoading, setRateLoading] = useState(currency !== 'ZEC');
   const [rateError, setRateError] = useState(false);
   const [manualRate, setManualRate] = useState('');
+
+  function changeCurrency(next: Currency) {
+    setCurrency(next);
+    if (next === currency || next === 'ZEC') return;
+    setRateLoading(true);
+    setRateError(false);
+    setRates(null); // clear stale rates so manual fallback shows on failure
+  }
 
   // Fetch rates when currency changes to non-ZEC
   useEffect(() => {
     if (currency === 'ZEC') return;
     let cancelled = false;
-    setRateLoading(true);
-    setRateError(false);
-    setRates(null); // clear stale rates so manual fallback shows on failure
     fetchZecRates()
       .then((r) => {
         if (!cancelled) {
@@ -174,7 +179,7 @@ export default function ExpenseForm({ members, onSave, onClose, existing }: Prop
                 <button
                   key={c}
                   type="button"
-                  onClick={() => setCurrency(c)}
+                  onClick={() => changeCurrency(c)}
                   className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     currency === c
                       ? 'bg-accent text-bg'

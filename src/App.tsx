@@ -15,40 +15,32 @@ import GroupSettings from './components/GroupSettings';
 type View = 'home' | 'new-group' | 'group';
 type Tab = 'expenses' | 'balances' | 'settle' | 'settings';
 
+function loadInitialState() {
+  const state = loadState();
+  // Migrate old groups that lack paidSettlements or expense dates
+  const groups: Group[] = state.groups.map((g) => ({
+    ...g,
+    paidSettlements: g.paidSettlements || [],
+    expenses: g.expenses.map((e) => ({
+      ...e,
+      currency: e.currency || 'ZEC',
+      zecAmount: e.zecAmount ?? e.amount,
+      date: e.date || new Date(e.createdAt).toISOString().split('T')[0],
+    })),
+  }));
+  return { groups, activeGroupId: state.activeGroupId || null };
+}
+
 export default function App() {
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
-  const [view, setView] = useState<View>('home');
+  const [initial] = useState(loadInitialState);
+  const [groups, setGroups] = useState<Group[]>(initial.groups);
+  const [activeGroupId, setActiveGroupId] = useState<string | null>(initial.activeGroupId);
+  const [view, setView] = useState<View>(initial.activeGroupId ? 'group' : 'home');
   const [expenseFormState, setExpenseFormState] = useState<{ open: boolean; editing?: Expense }>({ open: false });
   const [activeTab, setActiveTab] = useState<Tab>('expenses');
-  const [sharedGroup, setSharedGroup] = useState<Group | null>(null);
+  // Check for shared group in URL
+  const [sharedGroup, setSharedGroup] = useState<Group | null>(getSharedGroupFromUrl);
   const [shareToast, setShareToast] = useState(false);
-
-  useEffect(() => {
-    const state = loadState();
-    // Migrate old groups that lack paidSettlements or expense dates
-    const migrated = state.groups.map((g) => ({
-      ...g,
-      paidSettlements: g.paidSettlements || [],
-      expenses: g.expenses.map((e) => ({
-        ...e,
-        currency: e.currency || 'ZEC',
-        zecAmount: e.zecAmount ?? e.amount,
-        date: e.date || new Date(e.createdAt).toISOString().split('T')[0],
-      })),
-    }));
-    setGroups(migrated);
-    if (state.activeGroupId) {
-      setActiveGroupId(state.activeGroupId);
-      setView('group');
-    }
-
-    // Check for shared group in URL
-    const incoming = getSharedGroupFromUrl();
-    if (incoming) {
-      setSharedGroup(incoming);
-    }
-  }, []);
 
   function handleImportShared() {
     if (!sharedGroup) return;
