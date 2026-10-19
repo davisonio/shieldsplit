@@ -11,9 +11,11 @@ pnpm install
 pnpm dev
 ```
 
-That's it. Opens at http://localhost:5173.
+That's it. `pnpm dev` runs `cf dev` and prints the local URL.
 
 To build for production: `pnpm build` (static files land in `dist/`).
+
+To deploy as a Cloudflare Worker serving static assets: `pnpm run deploy` (runs `cf deploy`). Config is in `cloudflare.config.ts`.
 
 ## How it works
 
