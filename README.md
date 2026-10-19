@@ -13,9 +13,9 @@ pnpm dev
 
 That's it. `pnpm dev` runs `cf dev` and prints the local URL.
 
-To build for production: `pnpm build` (static files land in `dist/`).
+To build for production: `pnpm build` (static files land in `.cloudflare/output/`).
 
-To deploy as a Cloudflare Worker serving static assets: `pnpm run deploy` (runs `cf deploy`). Config is in `cloudflare.config.ts`.
+To deploy as a Cloudflare Worker serving static assets: `pnpm run deploy` (runs `cf deploy`). Config is in `cloudflare.config.ts`. The Worker is `shieldsplit` on `shieldsplit.overcultured.workers.dev`, behind Cloudflare Access (owner only), so it's not public.
 
 ## How it works
 
